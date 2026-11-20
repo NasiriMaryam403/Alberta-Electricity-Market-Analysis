@@ -1,6 +1,6 @@
 import pandas as pd
 print("ASEO Energy Analysis Project")
-df = pd.read_csv("AESO_Energy_Analysis/data/aeso_2020_2025.csv")
+df = pd.read_csv("aeso_2020_2025.zip", compression="zip")
 print(df.head())
 print("Dataset shape:" ,df.shape)
 print(df.columns.tolist())
@@ -37,4 +37,4 @@ print(hourly_price)
 hourly_analysis = df.groupby("hour")[["ACTUAL_AIL" , "ACTUAL_POOL_PRICE"]].mean()
 print(hourly_analysis)
 print(hourly_analysis["ACTUAL_AIL"].corr(hourly_analysis["ACTUAL_POOL_PRICE"]))
-df.to_csv("AESO_Energy_Analysis/aseo_dashboard_data.csv" , index=False)
+df.to_csv("aeso_dashboard_data.csv", index=False)
