@@ -1,0 +1,40 @@
+import pandas as pd
+print("ASEO Energy Analysis Project")
+df = pd.read_csv("AESO_Energy_Analysis/data/aeso_2020_2025.csv")
+print(df.head())
+print("Dataset shape:" ,df.shape)
+print(df.columns.tolist())
+print(df[["ACTUAL_POOL_PRICE", "ACTUAL_AIL", "HOUR_AHEAD_POOL_PRICE_FORECAST"]].isnull().sum())
+print(df[["Date_Begin_Local", "ACTUAL_POOL_PRICE", "ACTUAL_AIL", "HOUR_AHEAD_POOL_PRICE_FORECAST"]].dtypes)
+df["Date_Begin_Local"] = pd.to_datetime(df["Date_Begin_Local"])
+print(df["Date_Begin_Local"].dtype)
+df["year"] = df["Date_Begin_Local"].dt.year
+print(df[["Date_Begin_Local","year"]].head())
+print(df["year"].unique())
+annual_price = df.groupby("year")["ACTUAL_POOL_PRICE"].mean()
+print(annual_price)
+print("Maximum price:", df["ACTUAL_POOL_PRICE"].max())
+print("Minimum price:", df["ACTUAL_POOL_PRICE"].min())
+print(df.loc[df["ACTUAL_POOL_PRICE"].idxmax(),["Date_Begin_Local","ACTUAL_POOL_PRICE"]])
+print((df["ACTUAL_POOL_PRICE"]== 999.99).sum())
+high_prices = df[df["ACTUAL_POOL_PRICE"] == 999.99]
+print(high_prices.groupby("year").size())
+print(df.groupby("year")["ACTUAL_POOL_PRICE"].apply(lambda x: (x > 500).sum()))
+print(df.groupby("year")["ACTUAL_POOL_PRICE"].apply(lambda x: (x > 500).mean()*100))
+print(df[["ACTUAL_AIL" , "ACTUAL_POOL_PRICE"]].corr())
+print(df.groupby("year").apply(
+    lambda x: x["ACTUAL_AIL"].corr(x["ACTUAL_POOL_PRICE"]),
+    include_groups=False
+))
+annual_demand = df.groupby("year")["ACTUAL_AIL"].mean()
+print(annual_demand)
+peak_deman= df.groupby("year")["ACTUAL_AIL"].max()
+print(peak_deman)
+df["hour"] = df["Date_Begin_Local"].dt.hour
+print(df.groupby("hour")["ACTUAL_AIL"].mean())
+hourly_price = df.groupby("hour")["ACTUAL_POOL_PRICE"].mean()
+print(hourly_price)
+hourly_analysis = df.groupby("hour")[["ACTUAL_AIL" , "ACTUAL_POOL_PRICE"]].mean()
+print(hourly_analysis)
+print(hourly_analysis["ACTUAL_AIL"].corr(hourly_analysis["ACTUAL_POOL_PRICE"]))
+df.to_csv("AESO_Energy_Analysis/aseo_dashboard_data.csv" , index=False)
